@@ -14,7 +14,7 @@
 - Github: https://github.com/omininola/gs_iot
 - Wokwi: https://wokwi.com/projects/433181212584749057
 - ThingSpeak: https://thingspeak.mathworks.com/channels/2981469
-- Apresentação: https://youtu.be/d40gbNub_3E
+- Apresentação: https://youtu.be/Or7rEASWQ_0
 - Pitch: https://youtu.be/Sd4V2oEn3bM
 
 ---
