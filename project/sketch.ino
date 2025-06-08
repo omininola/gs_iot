@@ -2,10 +2,13 @@
 #include <ThingSpeak.h>
 #include <DHT.h>
 
-#define DHTPIN 15
-#define DHTTYPE DHT22
+#define AIR_PIN 35
+#define LIGHT_PIN 34
 
-DHT dht(DHTPIN, DHTTYPE);
+#define DHT_PIN 17
+#define DHT_TYPE DHT22
+
+DHT dht(DHT_PIN, DHT_TYPE);
 
 const char* SSID = "Wokwi-GUEST";
 const char* PSWD = "";
@@ -17,7 +20,7 @@ const char* writeAPIKey = "54BV82DI9T8HHRPE";
 float temperature;
 float humidity;
 float airQuality;
-float fireLevel;
+int fireLevel;
 
 void connectWifi() {
   if (WiFi.status() != WL_CONNECTED) {
@@ -37,12 +40,12 @@ void connectWifi() {
 
     if (WiFi.status() == WL_CONNECTED) {
       Serial.print("\nConnected to ");
-      Serial.print(SSID);
+      Serial.println(SSID);
 
-      Serial.print("\nIP: ");
-      Serial.print(WiFi.localIP());
+      Serial.print("IP: ");
+      Serial.println(WiFi.localIP());
     } else {
-      Serial.print("\nError while trying to connect");
+      Serial.println("\nError while trying to connect");
     }
   }
 }
@@ -50,13 +53,16 @@ void connectWifi() {
 void setup() {
   Serial.begin(115200);
 
+  pinMode(LIGHT_PIN, INPUT);
+  
   WiFi.mode(WIFI_STA);
   connectWifi();
+
   ThingSpeak.begin(client);
   dht.begin();
 
   Serial.println("Initializing client...");
-  delay(2000);  
+  delay(2000);
   Serial.println("Client connected");
 }
 
@@ -65,21 +71,22 @@ void loop() {
 
   temperature = dht.readTemperature();
   humidity = dht.readHumidity();
-  airQuality = analogRead(32);
-  fireLevel = digitalRead(33);
+  airQuality = analogRead(AIR_PIN);
+  fireLevel = !digitalRead(LIGHT_PIN);
 
   Serial.println("----- Simulated Data -----");
   Serial.printf("Temperature: %.2f°C\n", temperature);
   Serial.printf("Humidity: %.2f%%\n", humidity);
   Serial.printf("Air Quality (ppm): %.2f\n", airQuality);
-  Serial.printf("Fire Level: %.2f\n", fireLevel);
+  Serial.printf("Fire Level: ");
+  Serial.println(fireLevel ? "Detected" : "Not Detected");
   Serial.println("--------------------------");
 
   ThingSpeak.setField(1, temperature);
   ThingSpeak.setField(2, humidity);
   ThingSpeak.setField(3, airQuality);
   ThingSpeak.setField(4, fireLevel);
-  
+
   int status = ThingSpeak.writeFields(channelID, writeAPIKey);
 
   if (status == 200) {
